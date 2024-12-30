@@ -3,6 +3,7 @@ package com.cursosxtema.cursosxtema.service;
 import com.cursosxtema.cursosxtema.model.Curso;
 import com.cursosxtema.cursosxtema.model.Tema;
 import com.cursosxtema.cursosxtema.repository.ICursoRepository;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,26 +35,28 @@ public class CursoService implements ICursoService{
     @Override
     public List<Curso> getCursos(String cadena) {
         List<Curso> listaCursos = cursoRepo.findAll();
-        listaCursos.removeIf(c -> !c.getNombre().equalsIgnoreCase("java"));
+        listaCursos.removeIf(c -> !c.getNombre().toLowerCase().contains(cadena.toLowerCase()));
         return listaCursos;
     }
 
     @Override
     public Curso editCurso(Curso curs) {
         cursoRepo.save(curs);
-        return cursoRepo.getReferenceById(curs.getIdCurso());
+        return cursoRepo.findById(curs.getIdCurso())
+                        .orElse(null);
     }
 
     @Override
     public Curso findCurso(Long idCurso) {
-        return cursoRepo.findById(idCurso).orElse(null);
+        return cursoRepo.findById(idCurso)
+                        .orElse(null);
     }
 
     @Override
     public List<Tema> listaTemas(Curso curs) {
-        return cursoRepo.getReferenceById(curs.getIdCurso()).getListaTemas();
+        return cursoRepo.findById(curs.getIdCurso())
+                    .map(Curso::getListaTemas)
+                    .orElse(Collections.emptyList());
     }
-    
-    
 
 }

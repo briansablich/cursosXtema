@@ -2,9 +2,7 @@ package com.cursosxtema.cursosxtema.service;
 
 import com.cursosxtema.cursosxtema.model.Curso;
 import com.cursosxtema.cursosxtema.model.Tema;
-import com.cursosxtema.cursosxtema.repository.ICursoRepository;
 import com.cursosxtema.cursosxtema.repository.ITemaRepository;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,19 +24,25 @@ public class TemaService implements ITemaService {
 
     @Override
     public void saveTema(Tema tem, Long idCurso) {
-        temaRepo.save(tem);
         Curso curs = cursoServ.findCurso(idCurso);
-        cursoServ.editCurso(curs);
-    }
-
-    @Override
-    public List<Tema> getTemas(Curso curs) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(curs != null){
+            //si el curso está definido lo setea en el tema
+            //y lo adhiere a su lista de temas
+            tem.setCurso(curs);
+            curs.getListaTemas().add(tem);
+            
+            //luego guarda ambas cosas
+            temaRepo.save(tem);
+        } else {
+            //si no está definido el curso guarda el tema sin la relacion
+            temaRepo.save(tem);
+        }
     }
 
     @Override
     public Tema editTema(Tema tem) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        temaRepo.save(tem);
+        return temaRepo.findById(tem.getIdTema()).orElse(null);
     }
 
     
